@@ -1,4 +1,6 @@
 /*
+ * File: main.c
+ *
  * Author: Jeronimo Mendes 99086 LEIC-T
  *   
  * Description: 
@@ -6,3 +8,4 @@
  * store strings in various directories.
  * 
  */
+
