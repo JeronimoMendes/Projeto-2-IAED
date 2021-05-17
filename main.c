@@ -21,7 +21,7 @@ int main() {
 	char *pCommand; /* Pointer to command */
 	int i = 0;
 
-    while (1) {
+	while (1) {
 
 		pCommand = (char *)malloc(sizeof(char));
 
