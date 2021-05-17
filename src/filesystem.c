@@ -11,13 +11,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "filesystem.h"
+#include "datastructs.h"
 
 void help();
 
 void selectCommand(char *command) {
 	if (!strcmp(command, "help")) help();
 
-	return ;
 }
 
 

@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "filesystem.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "datastructs.h": "c"
     }
 }
