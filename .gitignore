@@ -5,3 +5,5 @@ tests/
 Makefile
 justdoit.sh
 .vscode/settings.json
+exe_tmp
+build.sh

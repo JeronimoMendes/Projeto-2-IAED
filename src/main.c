@@ -14,12 +14,16 @@
 #include <string.h>
 #include <stdio.h>
 #include "filesystem.h"
+#include "datastructs.h"
 
 
 int main() {
 	char command;
 	char *pCommand; /* Pointer to command */
 	int i = 0;
+	RootNode fileSystem;
+
+	fileSystem = createLinkedList(); 
 
 	while (1) {
 
@@ -34,7 +38,7 @@ int main() {
 		}
 		pCommand[i] = '\0';
 
-		selectCommand(pCommand);
+		selectCommand(pCommand, fileSystem);
 
 		if (!strcmp(pCommand, "quit")) break;
 	}
