@@ -23,6 +23,7 @@
 typedef struct element_s *Element;
 typedef struct head_s {
 	Element firstNode;
+	Node *avlTree;
 } *Head;
 
 
@@ -49,17 +50,17 @@ void iterateList(Head list, void (*function)(char*, char*));
  * AVL TREE
 */
 
-struct Node
+typedef struct node_s
 {
     Element element;
-    struct Node *left;
-    struct Node *right;
+    Node *left;
+    Node *right;
     int height;
-};
+} Node;
 
-struct Node *leftRotate(struct Node *x);
-int getBalance(struct Node *N);
-struct Node* insert(struct Node* node, Element ele);
+Node *leftRotate(Node *x);
+int getBalance(Node *N);
+Node* insertNode(Node* node, Element ele);
 
 
 /* MISC */

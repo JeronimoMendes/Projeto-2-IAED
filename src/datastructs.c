@@ -183,7 +183,7 @@ void iterateList(Head list, void (*function)(char*, char*)) {
  * 
 */
 
-int height(struct Node *N)
+int height(Node *N)
 {
     if (N == NULL)
         return 0;
@@ -191,8 +191,8 @@ int height(struct Node *N)
 }
 
 
-struct Node* newNode(Element ele) {
-    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+Node* newNode(Element ele) {
+    Node* node = (Node*)malloc(sizeof(Node));
     node->element = ele;
     node->left = NULL;
     node->right = NULL;
@@ -201,9 +201,9 @@ struct Node* newNode(Element ele) {
 }
 
 
-struct Node *rightRotate(struct Node *y) {
-    struct Node *x = y->left;
-    struct Node *T2 = x->right;
+Node *rightRotate(Node *y) {
+    Node *x = y->left;
+    Node *T2 = x->right;
  
     /* Rotate */
     x->right = y;
@@ -217,9 +217,9 @@ struct Node *rightRotate(struct Node *y) {
 }
 
 
-struct Node *leftRotate(struct Node *x) {
-    struct Node *y = x->right;
-    struct Node *T2 = y->left;
+Node *leftRotate(Node *x) {
+    Node *y = x->right;
+    Node *T2 = y->left;
  
     y->left = x;
     x->right = T2;
@@ -231,14 +231,14 @@ struct Node *leftRotate(struct Node *x) {
 }
 
 
-int getBalance(struct Node *N) {
+int getBalance(Node *N) {
     if (N == NULL)
         return 0;
     return height(N->left) - height(N->right);
 }
 
 
-struct Node* insert(struct Node* node, Element ele) {
+Node* insertNode(Node* node, Element ele) {
     if (node == NULL)
         return(newNode(ele));
  
@@ -270,4 +270,16 @@ struct Node* insert(struct Node* node, Element ele) {
     }
  
     return node;
+}
+
+
+/* Utilities that join the two structures */
+Element addElement(Head list, char *key, char *content){
+	Element ele;
+
+	ele = appendToList(list, key, content);
+	if (list->avlTree != NULL) list->avlTree = newNode(ele);
+	else insert(list->avlTree, ele);
+	
+	return ele;
 }
