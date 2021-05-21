@@ -25,20 +25,22 @@ delete: Apaga um caminho e todos os subcaminhos.\n"
 #define False 0
 
 /* Function declaration */
-void read_str(char *str, int word);
+char* read_str(int word);
 int next_param();
 char** getDirs(char *path, int *count);
-void addNewDir(RootNode list, char **dirs, char *value, int length);
-void selectCommand(char *command, RootNode list);
-Node findDir(RootNode list, char **dirs, int length);
-void addSlashToPath(char* path);
+void addNewDir(Head list, char **dirs, char *value, int length);
+void selectCommand(char *command, Head list);
+Element findDir(Head list, char **dirs, int length);
+void addTrailingSlash(char* path);
+void addLeadingSlash(char** path);
+void printKeyContent(char* key, char* content);
 
 void help();
 void quit();
-void set(RootNode list);
+void set(Head list);
 void print();
-void find(RootNode list);
+void find(Head list);
 void list();
-void search();
-/* void delete(); */
+void search(Head list);
+void delete(Head list);
 void flushIO();

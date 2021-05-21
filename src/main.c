@@ -21,13 +21,12 @@ int main() {
 	char command;
 	char *pCommand; /* Pointer to command */
 	int i = 0;
-	RootNode fileSystem;
+	Head fileSystem;
 
-	fileSystem = createLinkedList(); 
-
+	fileSystem = createLinkedList();
+	pCommand = (char *)malloc(sizeof(char)); 
+	
 	while (1) {
-
-		pCommand = (char *)malloc(sizeof(char));
 
 		i = 0;
 		while ((command = getchar()) != ' ' && command != '\n') {
@@ -37,10 +36,13 @@ int main() {
 			pCommand = (char *)realloc(pCommand, sizeof(char) * (i + 1) );
 		}
 		pCommand[i] = '\0';
-
+		
 		selectCommand(pCommand, fileSystem);
 
-		if (!strcmp(pCommand, "quit")) break;
+		if (!strcmp(pCommand, "quit")) {
+			destroyLinkedList(fileSystem, NULL);
+			break;
+		}
 	}
 
 	free(pCommand);

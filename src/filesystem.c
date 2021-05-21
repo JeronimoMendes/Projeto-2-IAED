@@ -14,10 +14,13 @@
 #include "datastructs.h"
 
 
-void selectCommand(char *command, RootNode list) {
+void selectCommand(char *command, Head list) {
 	if (!strcmp(command, "help")) help();
 	if (!strcmp(command, "set")) set(list);
 	if (!strcmp(command, "find")) find(list);
+	if (!strcmp(command, "delete")) delete(list);
+	if (!strcmp(command, "search")) search(list);
+	if (!strcmp(command, "print")) print(list);
 
 }
 
@@ -29,18 +32,18 @@ void help() {
 }
 
 
-void set(RootNode list) {
+void set(Head list) {
 	char *path, *value, **dirs;
-	int *count; 
-	Node dir;
+	int *count, i;
+	Element dir;
 
 	count = (int*)malloc(sizeof(int));
-	path = (char*)malloc(sizeof(char));
-	value = (char*)malloc(sizeof(char));
+	path = (char*)malloc(sizeof(char) + 1);
+	value = (char*)malloc(sizeof(char) + 1);
 	*count = 0;
-	read_str(path, True);
+	path = read_str(True);
 	next_param();
-	read_str(value, False);
+	value = read_str(False);
 	flushIO();
 
 	dirs = malloc(sizeof(char*));
@@ -51,22 +54,22 @@ void set(RootNode list) {
 	if (dir) changeNodeContent(dir, value);
 	else addNewDir(list , dirs, value, *count);
 
-	free(path);
-	free(value);
+	for (i = 0; i < *count; i++) free(dirs[i]);
 	free(count);
 }
 
 
-void find(RootNode list) {
+void find(Head list) {
 	char *path, **dirs;
 	int *length;
 	
-	Node dir;
+	Element dir;
 
 	length = (int*)malloc(sizeof(int));
 	*length = 0;
-	path = (char*)malloc(sizeof(char));
-	read_str(path, True);
+	path = (char*)malloc(sizeof(char) + 1);
+	path = read_str(True);
+	
 	flushIO();
 
 	dirs = getDirs(path, length);
@@ -85,35 +88,98 @@ void find(RootNode list) {
 }
 
 
+void delete(Head list) {
+	char *path, **dirs;
+	int *length;
+	Element dir, fatherDir;
+
+	length = (int*)malloc(sizeof(int));
+	*length = 0;
+
+	path = read_str(True);
+
+	if (!path) {
+		/* Erase directory */
+	}
+
+	dirs = getDirs(path, length);
+	dir = findDir(list, dirs, *length);
+
+	if (dir == NULL) {
+		printf("not found\n");
+		return;
+	}
+
+	fatherDir = findDir(list, dirs, *length - 1);
+	if (fatherDir != dir) list = fatherDir->subList;
+
+
+	removeNode(list, dir);
+}
+
+
+void search(Head list) {
+	char *value, *result;
+	Element node;
+
+	value = read_str(False);
+	flushIO();
+
+	node = findContentInList(list, value);
+
+	if (node == NULL) {
+		printf("not found");
+		return;
+	}
+
+	result = strdup(node->key);
+	addLeadingSlash(&result);
+
+	printf("%s\n", result);
+	free(result);
+}
+
+
+void print(Head list) {
+	iterateList(list, *printKeyContent);
+}
+
+
+
 /* Reads a string. if word = true it only reads 1 word. */
-void read_str(char *str, int word){
+char* read_str(int word){
     int i;
-    char input;
+    char input, *str;
+	str = (char*)malloc(sizeof(char));
+
 
     /* if word == True it will only read 1 word. */
     for (i = 0; (input = getchar()) != '\n' && input != EOF; i++) {
         if (word && (input == ' ' || input == '\t')) break;
 
         str[i] = input;
-		str = realloc(str, sizeof(char) * i + 1);
+		str = realloc(str, sizeof(char) * (i + 1) + 1);
     }
  
     str[i] = '\0'; 
 
     if (input == '\n') ungetc(input, stdin);
+	return str;
 }
 
 
 char** getDirs(char *path, int *count) {
-	char *token, **dirs;
+	char *token, **dirs, *aux;
+	aux = strdup(path);
 
 	dirs = malloc(sizeof(char*));
 
-	for (token = strtok(path, "/"); token != NULL; token = strtok(NULL, "/")) {
+	for (token = strtok(aux, "/"); token != NULL; token = strtok(NULL, "/")) {
 		dirs = realloc(dirs ,sizeof(char*) * (*count + 1));
 		dirs[(*count)++] = strdup(token);
 	}
 
+	free(aux);
 	return dirs;
 }
 
@@ -136,18 +202,18 @@ void flushIO(){
 	while (getchar() != '\n');
 }
 
-void addNewDir(RootNode list, char **dirs, char *value, int length) {
-	Node fatherDir = NULL;
-	RootNode subdir;
+void addNewDir(Head list, char **dirs, char *value, int length) {
+	Element fatherDir = NULL;
+	Head subdir;
 	int i;
-	char *path = (char*)malloc(strlen(dirs[0]));
+	char *path = (char*)malloc(strlen(dirs[0]) + 1);
 	strcpy(path, dirs[0]);
 
 	for (i = 0; i < length - 1; i++) {
 		fatherDir = findInList(list, path);
 		if (fatherDir == NULL) fatherDir = appendToList(list, strdup(path), "");
 		list = fatherDir->subList;
-		addSlashToPath(path);
+		addTrailingSlash(path);
 		path = realloc(path, strlen(path) + strlen(dirs[i + 1]));
 		path = strcat(path, dirs[i+1]);
 	}
@@ -158,29 +224,46 @@ void addNewDir(RootNode list, char **dirs, char *value, int length) {
 	appendToList(subdir, path, value);
 }
 
-Node findDir(RootNode list, char **dirs, int length) {
+Element findDir(Head list, char **dirs, int length) {
 	int i;
-	Node dir;
-	char *path = (char*)malloc(strlen(dirs[0]));
+	Element dir;
+	char *path = (char*)malloc(strlen(dirs[0]) + 1);
 	strcpy(path, dirs[0]);
 
 	for (i = 0; i < length && (dir = findInList(list, path)) != NULL; i++) {
 		if (dir) list = dir -> subList;
 		
 		if (i + 1 < length) {
-			addSlashToPath(path);
+			addTrailingSlash(path);
 			path = realloc(path, strlen(path) + strlen(dirs[i + 1]));
 			path = strcat(path, dirs[i + 1]);
 		}
 	}
 
-	free(path);
 	return dir;
 }
 
 
 /* Adds a trailing slash to a string */
-void addSlashToPath(char* path) {
+void addTrailingSlash(char* path) {
 	path = strcat(path, "/");
 	path = realloc(path, strlen(path) + 1);
+}
+
+
+/* Adds a leading slash to a string */
+void addLeadingSlash(char** path) {
+	char *slash;
+	slash = strdup("/");
+	slash = strcat(slash, *path);
+	*path = realloc(*path, strlen(*path) + 1);
+	*path = strdup(slash);
+	free(slash);
+}
+
+void printKeyContent(char* key, char* content) {
+	if (content[0] != '\0') {
+		addLeadingSlash(&key);
+		printf("%s %s\n", key, content);
+	}
 }
