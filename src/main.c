@@ -37,10 +37,10 @@ int main() {
 		}
 		pCommand[i] = '\0';
 		
-		selectCommand(pCommand, fileSystem);
+		selectCommand(pCommand, fileSystem, command);
 
 		if (!strcmp(pCommand, "quit")) {
-			destroyLinkedList(fileSystem, NULL);
+			destroyLinkedList(fileSystem);
 			break;
 		}
 	}
